@@ -1,15 +1,15 @@
 window.onload = function () {
   // 点击常规获取班级学生列表
-  $('#btn2').click(function() {
+  $('#btn2').click(function () {
     getStudent()
   })
   // 点击常规获取课程列表
-  $('#btn1').click(function() {
+  $('#btn1').click(function () {
     getCouse()
   })
 
   // 点击graphQL一次获取所有数据，问你怕不怕？
-  $('#btn3').click(function() {
+  $('#btn3').click(function () {
     $.ajax({
       url: '/graphql',
       data: {
@@ -26,31 +26,31 @@ window.onload = function () {
             age
             _id
           }
-        }`
+        }`,
       },
-      success:function (res){
-        renderStudent (res.data.getStudent)
-        renderCourse (res.data.getCourse)
-      }
+      success: function (res) {
+        renderStudent(res.data.getStudent)
+        renderCourse(res.data.getCourse)
+      },
     })
   })
 
   // 点击添加课程数据
   $('#btn4').click(() => {
     $('#side').css({
-      transform: 'translateX(0px)'
+      transform: 'translateX(0px)',
     })
   })
   // 点击关闭课程数据
   $('#closeCourse').click(() => {
     $('#side').css({
-      transform: 'translateX(-320px)'
+      transform: 'translateX(-320px)',
     })
   })
   // 常规添加课程
   $('#add_class').click(() => {
     $('#side').css({
-      transform: 'translateX(-320px)'
+      transform: 'translateX(-320px)',
     })
     $.ajax({
       url: '/savescourse',
@@ -63,12 +63,12 @@ window.onload = function () {
         page: Number($('#c_page').val()),
         author: $('#c_author').val(),
       }),
-      success:function (res){
+      success: function (res) {
         getCouse()
         $('#side').css({
-          transform: 'translateX(-320px)'
+          transform: 'translateX(-320px)',
         })
-      }
+      },
     })
   })
 
@@ -80,8 +80,8 @@ window.onload = function () {
     const author = $('#c_author').val()
     $.ajax({
       url: '/graphql',
-      contentType: "application/json",
-      type:'POST',
+      contentType: 'application/json',
+      type: 'POST',
       data: JSON.stringify({
         query: `
           mutation {
@@ -97,14 +97,14 @@ window.onload = function () {
               author
             }
           }
-        `
+        `,
       }),
-      success:function (){
+      success: function () {
         getCouse()
         $('#side').css({
-          transform: 'translateX(-320px)'
+          transform: 'translateX(-320px)',
         })
-      }
+      },
     })
   })
 
@@ -114,20 +114,20 @@ window.onload = function () {
     $('#s_sex').val('')
     $('#s_age').val('')
     $('#side2').css({
-      transform: 'translateX(0px)'
+      transform: 'translateX(0px)',
     })
   })
   // 点击关闭课程数据
   $('#closeStudent').click(() => {
     $('#side2').css({
-      transform: 'translateX(-320px)'
+      transform: 'translateX(-320px)',
     })
   })
- 
+
   // 常规添加学生
   $('#add_student').click(() => {
     $('#side').css({
-      transform: 'translateX(-320px)'
+      transform: 'translateX(-320px)',
     })
     $.ajax({
       url: '/savestudent',
@@ -137,14 +137,14 @@ window.onload = function () {
       data: JSON.stringify({
         name: $('#s_name').val(),
         sex: $('#s_sex').val(),
-        age: Number($('#s_age').val())
+        age: Number($('#s_age').val()),
       }),
-      success:function (res){
+      success: function (res) {
         getStudent()
         $('#side2').css({
-          transform: 'translateX(-320px)'
+          transform: 'translateX(-320px)',
         })
-      }
+      },
     })
   })
 
@@ -156,7 +156,7 @@ window.onload = function () {
     $.ajax({
       url: '/graphql',
       contentType: 'application/json',
-      type:'POST',
+      type: 'POST',
       data: JSON.stringify({
         query: `
           mutation {
@@ -170,57 +170,86 @@ window.onload = function () {
               age
             }
           }
-        `
+        `,
       }),
-      success:function (){
+      success: function () {
         getStudent()
         $('#side2').css({
-          transform: 'translateX(-320px)'
+          transform: 'translateX(-320px)',
         })
-      }
+      },
     })
   })
 
   // 获取全部课程
-  function getCouse () {
+  function getCouse() {
     $.ajax({
       url: '/course',
       data: {},
-      success:function (res){
+      success: function (res) {
         if (res.success) {
           renderCourse(res.data)
         }
-      }
+      },
     })
   }
   // 获取全部学生
-  function getStudent () {
+  function getStudent() {
     $.ajax({
       url: '/student',
       data: {},
-      success:function (res){
+      success: function (res) {
         if (res.success) {
           renderStudent(res.data)
         }
-      }
+      },
     })
   }
   let isAddInfo = false
   let infoId = null
   // 打开学生info
-  $('#studentList').click(e => {
+  $('#studentList').click((e) => {
+    console.log(e.target.nodeName)
+    if (e.target.nodeName === 'BUTTON') {
+      $('#side3').css({
+        transform: 'translateX(0px)',
+      })
+      $.ajax({
+        url: '/graphql',
+        data: {
+          query: `
+              query {
+                getStudentInfo(
+                    id: "${e.target.dataset.id}",
+                  ) {
+                   height
+                   weight
+                   hobby
+                  }
+              }
+          `,
+        },
+        success: function (res) {
+          if (res.success) {
+            resolve(res.data)
+          } else {
+            resolve(false)
+          }
+        },
+      })
+    }
     if (e.target.nodeName === 'A') {
       $('#side3').css({
-        transform: 'translateX(0px)'
+        transform: 'translateX(0px)',
       })
-      getStudentInfo(e.target.dataset.id).then(res => {
+      getStudentInfo(e.target.dataset.id).then((res) => {
         infoId = e.target.dataset.id
         if (res) {
           isAddInfo = false
           $('#i_height').val(res.height)
           $('#i_weight').val(res.weight)
           let checkboxs = $('#side3 input[name="hobby"]')
-          res.hobby.forEach(item => {
+          res.hobby.forEach((item) => {
             for (let i = 0; i < 4; i++) {
               if (checkboxs[i].value === item) {
                 checkboxs[i].checked = true
@@ -257,7 +286,7 @@ window.onload = function () {
       $.ajax({
         url: '/graphql',
         contentType: 'application/json',
-        type:'POST',
+        type: 'POST',
         data: JSON.stringify({
           query: `
             mutation {
@@ -272,20 +301,21 @@ window.onload = function () {
                 hobby
               }
             }
-          `
+          `,
         }),
-        success:function (){
+        success: function () {
           getStudent()
           $('#side3').css({
-            transform: 'translateX(-320px)'
+            transform: 'translateX(-320px)',
           })
-        }
+        },
       })
-    } else { // 修改
+    } else {
+      // 修改
       $.ajax({
         url: '/graphql',
         contentType: 'application/json',
-        type:'POST',
+        type: 'POST',
         data: JSON.stringify({
           query: `
             mutation {
@@ -300,52 +330,52 @@ window.onload = function () {
                 hobby
               }
             }
-          `
+          `,
         }),
-        success:function (){
+        success: function () {
           getStudent()
           $('#side3').css({
-            transform: 'translateX(-320px)'
+            transform: 'translateX(-320px)',
           })
-        }
+        },
       })
     }
   })
 
   $('#closeInfo').click(() => {
     $('#side3').css({
-      transform: 'translateX(-320px)'
+      transform: 'translateX(-320px)',
     })
   })
 
-  function getStudentInfo (id) {
+  function getStudentInfo(id) {
     return new Promise((resolve, reject) => {
       $.ajax({
         url: '/studentInfo',
-        data: {id: id},
-        success:function (res){
+        data: { id: id },
+        success: function (res) {
           if (res.success) {
             resolve(res.data)
           } else {
             resolve(false)
           }
-        }
+        },
       })
     })
   }
 
-  function renderStudent (data) {
+  function renderStudent(data) {
     var str = ''
-    data.forEach(function(item) {
-      str += `<li>姓名：${item.name}，性别：${item.sex}，年龄：${item.age}<a data-id="${item._id}">查看info</a></li>`
+    data.forEach(function (item) {
+      str += `<li><button id="gql" data-id="${item._id}" type="button">查看info gql</button>姓名：${item.name}，性别：${item.sex}，年龄：${item.age}<a data-id="${item._id}">查看info</a></li>`
     })
     $('#studentList').html(str)
   }
 
-  function renderCourse (data) {
+  function renderCourse(data) {
     var str = ''
-    data.forEach(function(item) {
-      str += '<li>课程：'+item.title+'，简介：'+item.desc+'</li>'
+    data.forEach(function (item) {
+      str += '<li>课程：' + item.title + '，简介：' + item.desc + '</li>'
     })
     $('#courseList').html(str)
   }
